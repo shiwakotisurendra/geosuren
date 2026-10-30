@@ -21,7 +21,3 @@ python3 -m http.server 8000   # open http://localhost:8000/map.html
    - on every push to `master`: redeploys the site;
    - monthly and via **Actions → Run workflow**: rebuilds the Landsat data, commits it to `master`, then deploys. Tick *force* to recompute all years.
 3. Site: `https://shiwakotisurendra.github.io/geosuren/`
-
-## Before going public
-- Replace `your-email@example.com` in all pages with your real address.
-- Confirm that offering independent consulting is compatible with your employment contract.
