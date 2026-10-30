@@ -1,0 +1,151 @@
+{
+  "area": "Chitwan, Nepal",
+  "center": [
+    27.62,
+    84.45
+  ],
+  "season_months": [
+    3,
+    4,
+    5
+  ],
+  "years": [
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025,
+    2026
+  ],
+  "bounds": [
+    [
+      27.390574926055013,
+      84.18967549556923
+    ],
+    [
+      27.809387374933397,
+      84.7085504755162
+    ]
+  ],
+  "stats": {
+    "2015": {
+      "lst_mean": 29.87,
+      "lst_p95": 34.78,
+      "ndvi_mean": 0.597,
+      "valid_fraction": 1.0,
+      "n_scenes": 9
+    },
+    "2016": {
+      "lst_mean": 32.14,
+      "lst_p95": 39.41,
+      "ndvi_mean": 0.488,
+      "valid_fraction": 0.999,
+      "n_scenes": 11
+    },
+    "2017": {
+      "lst_mean": 30.12,
+      "lst_p95": 34.67,
+      "ndvi_mean": 0.559,
+      "valid_fraction": 1.0,
+      "n_scenes": 11
+    },
+    "2018": {
+      "lst_mean": 31.51,
+      "lst_p95": 36.75,
+      "ndvi_mean": 0.533,
+      "valid_fraction": 0.999,
+      "n_scenes": 11
+    },
+    "2019": {
+      "lst_mean": 32.69,
+      "lst_p95": 38.1,
+      "ndvi_mean": 0.585,
+      "valid_fraction": 1.0,
+      "n_scenes": 9
+    },
+    "2020": {
+      "lst_mean": 29.14,
+      "lst_p95": 35.67,
+      "ndvi_mean": 0.613,
+      "valid_fraction": 1.0,
+      "n_scenes": 10
+    },
+    "2021": {
+      "lst_mean": 29.73,
+      "lst_p95": 34.84,
+      "ndvi_mean": 0.471,
+      "valid_fraction": 1.0,
+      "n_scenes": 7
+    },
+    "2022": {
+      "lst_mean": 30.67,
+      "lst_p95": 35.45,
+      "ndvi_mean": 0.614,
+      "valid_fraction": 1.0,
+      "n_scenes": 19
+    },
+    "2023": {
+      "lst_mean": 32.2,
+      "lst_p95": 38.52,
+      "ndvi_mean": 0.534,
+      "valid_fraction": 1.0,
+      "n_scenes": 20
+    },
+    "2024": {
+      "lst_mean": 31.06,
+      "lst_p95": 37.25,
+      "ndvi_mean": 0.571,
+      "valid_fraction": 1.0,
+      "n_scenes": 17
+    },
+    "2025": {
+      "lst_mean": 32.87,
+      "lst_p95": 38.73,
+      "ndvi_mean": 0.564,
+      "valid_fraction": 1.0,
+      "n_scenes": 19
+    },
+    "2026": {
+      "lst_mean": 28.16,
+      "lst_p95": 32.59,
+      "ndvi_mean": 0.597,
+      "valid_fraction": 1.0,
+      "n_scenes": 22
+    }
+  },
+  "layers": {
+    "lst": {
+      "label": "Land surface temperature (\u00b0C)",
+      "min": 25.0,
+      "max": 50.0,
+      "colors": [
+        "#000004",
+        "#420a68",
+        "#932667",
+        "#dd513a",
+        "#fca50a",
+        "#fcffa4"
+      ]
+    },
+    "ndvi": {
+      "label": "NDVI (vegetation)",
+      "min": -0.1,
+      "max": 0.9,
+      "colors": [
+        "#ffffe5",
+        "#e5f5ac",
+        "#a2d88a",
+        "#4cb063",
+        "#15793e",
+        "#004529"
+      ]
+    }
+  },
+  "source": "Landsat 8/9 Collection 2 Level-2 via Microsoft Planetary Computer; median of cloud-masked scenes."
+}
