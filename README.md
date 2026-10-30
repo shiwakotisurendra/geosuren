@@ -1,4 +1,4 @@
-# Surendra Shiwakoti – geospatial consulting website
+# Surendra Shiwakoti – geoconsulting website
 
 Static HTML/CSS/JS site, no build step.
 
