@@ -184,3 +184,17 @@ form.contact input:focus, form.contact textarea:focus { outline: 2px solid var(-
 .steps { counter-reset: s; display: grid; gap: 1rem; padding: 0; list-style: none; }
 .steps li { counter-increment: s; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.1rem 1.3rem 1.1rem 4rem; position: relative; }
 .steps li::before { content: counter(s); position: absolute; left: 1.2rem; top: 1rem; width: 2rem; height: 2rem; border-radius: 50%; background: var(--green-700); color: #fff; display: grid; place-items: center; font-weight: 700; }
+
+/* Map page */
+#map { height: min(70vh, 600px); border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow); z-index: 0; }
+.map-controls { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); align-items: end; margin-bottom: 1rem; }
+.map-controls label { font-weight: 600; font-size: .9rem; display: grid; gap: .3rem; }
+.map-controls input[type=range] { width: 100%; accent-color: var(--green-700); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.seg button { font: inherit; padding: .5rem 1.1rem; border: 0; background: #fff; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--green-700); color: #fff; }
+.legend { margin-top: 1rem; max-width: 420px; font-size: .85rem; color: var(--muted); }
+.legend-bar { height: 12px; border-radius: 6px; margin: .3rem 0; }
+.legend-row { display: flex; justify-content: space-between; }
+.notice { background: var(--blue-100); border: 1px solid #b9d9ec; border-radius: 12px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+#chart svg { width: 100%; height: auto; max-width: 720px; }

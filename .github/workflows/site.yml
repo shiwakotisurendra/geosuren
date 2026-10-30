@@ -1,0 +1,77 @@
+name: Build data and deploy site
+
+on:
+  push:
+    branches: [master]
+  schedule:
+    - cron: "17 3 1 * *"   # monthly; new Landsat scenes are added to the current year
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Recompute all years (slow)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  data:
+    # Skip on ordinary pushes so editing the website stays fast
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/pyproject.toml
+      - name: Install pipeline
+        run: pip install "./pipeline[stac]"
+      - name: Build Landsat overlays for Chitwan
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then FORCE="--force"; fi
+          # The current year is always recomputed so new scenes are picked up
+          geosuren build --out data/chitwan --start "$(date +%Y)" --end "$(date +%Y)" --force
+          geosuren build --out data/chitwan $FORCE
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then echo "no data changes"; else
+            git commit -m "Update Chitwan Landsat data"
+            git push origin HEAD:master
+          fi
+
+  deploy:
+    needs: data
+    if: ${{ !cancelled() && (needs.data.result == 'success' || needs.data.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master   # pick up data committed by the previous job
+      - name: Stage site files
+        run: |
+          mkdir _site
+          rsync -a --exclude '.git' --exclude '.github' --exclude 'pipeline' --exclude '_site' ./ _site/
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

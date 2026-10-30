@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geosuren"
+version = "0.1.0"
+description = "Landsat land surface temperature and NDVI composites for Chitwan, Nepal, built from public STAC data (no Earth Engine account needed)."
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "xarray",
+  "rioxarray",
+  "pillow",
+  "matplotlib",
+]
+
+[project.optional-dependencies]
+stac = [
+  "pystac-client",
+  "planetary-computer",
+  "odc-stac",
+  "dask[array]",
+]
+test = ["pytest"]
+
+[project.scripts]
+geosuren = "geosuren.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
