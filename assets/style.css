@@ -226,3 +226,8 @@ fieldset.loc legend { font-weight: 600; padding: 0 .4rem; }
 
 /* Make the hidden attribute win over component display rules (e.g. .btn) */
 [hidden] { display: none !important; }
+
+/* Single post view: full-width panel, readable text lines, wide map */
+#post-view.prose { max-width: none; }
+#post-view p, #post-view h2, #post-view .chips { max-width: 80ch; }
+#post-view .mini-map { height: 380px; max-width: none; }
