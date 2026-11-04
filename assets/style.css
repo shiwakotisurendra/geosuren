@@ -223,3 +223,6 @@ fieldset.loc legend { font-weight: 600; padding: 0 .4rem; }
 .loc-search input { flex: 1; min-width: 180px; font: inherit; padding: .6rem .9rem; border: 1px solid var(--line); border-radius: 10px; }
 .coords { font-size: .85rem; color: var(--muted); margin-top: .5rem; }
 #post-view .lead { font-size: 1.1rem; color: var(--muted); }
+
+/* Make the hidden attribute win over component display rules (e.g. .btn) */
+[hidden] { display: none !important; }
