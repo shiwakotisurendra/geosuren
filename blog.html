@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geospatial Blog – Surendra Shiwakoti</title><meta name="description" content="Notes on remote sensing, GIS, Google Earth Engine and climate analytics – with the places they are about on a map.">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="assets/style.css"></head><body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="container header-inner">
+<a class="brand" href="index.html"><span class="brand-mark"></span>Surendra Shiwakoti</a>
+<button class="menu-toggle" aria-expanded="false" aria-label="Menu">☰ Menu</button>
+<nav class="main-nav" aria-label="Main"><ul><li><a href="index.html">Home</a></li><li><a href="services.html">Services</a></li><li><a href="projects.html">Projects</a></li><li><a href="map.html">Map</a></li><li><a href="blog.html" aria-current="page">Blog</a></li><li><a href="about.html">About</a></li><li><a class="btn" href="contact.html">Get in touch</a></li></ul></nav></div></header><main id="main">
+<div class="page-head"><div class="container blog-head"><div><h1>Geospatial blog</h1><p>Notes on remote sensing, GIS and climate analytics, pinned to the places they are about.</p></div>
+<div id="auth-bar" class="auth-bar" aria-live="polite"></div></div></div>
+
+<section><div class="container">
+<div id="blog-setup" class="notice" hidden><strong>Blog not configured yet.</strong> Add your Supabase URL and anon key in <code>assets/blog-config.js</code> and run <code>supabase-setup.sql</code> (see <code>BLOG_SETUP.md</code>).</div>
+<div id="blog-msg" class="notice" hidden role="status"></div>
+
+<div id="login-panel" class="panel" hidden>
+<h2>Log in</h2>
+<form id="login-form" class="contact">
+<label>Email<input name="email" type="email" autocomplete="email" required></label>
+<label>Password<input name="password" type="password" autocomplete="current-password" minlength="6" required></label>
+<p><button class="btn" type="submit" data-mode="login">Log in</button> <button class="btn ghost" type="button" id="signup-btn" hidden>Create account</button> <button class="btn ghost" type="button" id="login-cancel">Cancel</button></p>
+</form></div>
+
+<div id="editor-panel" class="panel" hidden>
+<h2 id="editor-title">New post</h2>
+<form id="post-form" class="contact wide">
+<input type="hidden" name="id">
+<label>Title<input name="title" maxlength="200" required></label>
+<label>Short summary (optional)<input name="summary" maxlength="400"></label>
+<label>Text<textarea name="body" rows="12" required placeholder="Blank line = new paragraph. Lines starting with '## ' become headings."></textarea></label>
+<label>Tags (comma separated)<input name="tags" placeholder="Landsat, UHI, Nepal"></label>
+<fieldset class="loc"><legend>Location (optional)</legend>
+<p class="hint">Click the map to place a pin, or search a place name. Drag the pin to adjust.</p>
+<div class="loc-search"><input id="place-q" type="search" placeholder="Search a place, e.g. Köln"><button class="btn ghost" type="button" id="place-go">Search</button><button class="btn ghost" type="button" id="loc-clear">Remove pin</button></div>
+<div id="editor-map" class="mini-map" role="application" aria-label="Pick a location for this post"></div>
+<label>Place name<input name="place_name" maxlength="200" placeholder="Bharatpur, Nepal"></label>
+<div class="coords"><span id="coord-out">No location set</span></div>
+</fieldset>
+<p><button class="btn" type="submit" id="post-save">Publish</button> <button class="btn ghost" type="button" id="editor-cancel">Cancel</button></p>
+</form></div>
+
+<div id="list-panel">
+<div class="blog-toolbar"><div class="seg" role="group" aria-label="View"><button type="button" data-view="list" aria-pressed="true">List</button><button type="button" data-view="map" aria-pressed="false">Map</button></div>
+<input id="blog-filter" type="search" placeholder="Filter by title, tag or place" aria-label="Filter posts">
+<button id="new-post-btn" class="btn" type="button" hidden>+ New post</button></div>
+<div id="blog-map" class="blog-map" hidden role="application" aria-label="Map of all posts"></div>
+<div id="posts" class="grid cols-2" aria-live="polite"><p class="hint">Loading posts…</p></div>
+</div>
+
+<article id="post-view" class="panel prose" hidden></article>
+</div></section></main>
+<footer class="site-footer"><div class="container">
+<div class="footer-grid">
+<div><h4>Surendra Shiwakoti</h4><p>Geospatial &amp; Earth Observation consultant. Remote sensing, spatial data infrastructure and climate analytics.</p><p>Köln, Germany</p></div>
+<div><h4>Pages</h4><ul><li><a href="index.html">Home</a></li><li><a href="services.html">Services</a></li><li><a href="projects.html">Projects</a></li><li><a href="map.html">Map</a></li><li><a href="blog.html">Blog</a></li><li><a href="about.html">About</a></li></ul></div>
+<div><h4>Services</h4><ul><li><a href="services.html#eo">Earth observation</a></li><li><a href="services.html#sdi">Spatial data infrastructure</a></li><li><a href="services.html#web">Web mapping</a></li><li><a href="services.html#geoai">GeoAI</a></li></ul></div>
+<div><h4>Contact</h4><ul><li><a href="contact.html">Contact form</a></li><li>shiwakotisurendra@gmail.com</li></ul></div>
+</div><div class="copyright">© 2026 Surendra Shiwakoti</div></div></footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/main.js"></script>
+<script src="assets/blog-config.js"></script>
+<script src="assets/blog.js"></script></body></html>
