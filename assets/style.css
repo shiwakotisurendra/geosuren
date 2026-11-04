@@ -231,3 +231,12 @@ fieldset.loc legend { font-weight: 600; padding: 0 .4rem; }
 #post-view.prose { max-width: none; }
 #post-view p, #post-view h2, #post-view .chips { max-width: 80ch; }
 #post-view .mini-map { height: 380px; max-width: none; }
+
+/* Comments */
+.comments { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+.comment { border: 1px solid var(--line); border-radius: 12px; padding: .9rem 1.1rem; margin-bottom: .75rem; background: #fff; max-width: 80ch; }
+.comment.pending { background: var(--blue-100); border-color: #b9d9ec; }
+.comment p { margin: .25rem 0 0; white-space: pre-line; }
+.comment-meta { font-size: .85rem; color: var(--muted); }
+.comment-form { margin-top: 1.5rem; max-width: 640px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
