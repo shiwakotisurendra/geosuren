@@ -14,7 +14,7 @@ document.querySelectorAll('.has-drop > button').forEach((btn) => {
 });
 
 // Contact form: open the visitor's mail client (static site, no backend)
-const form = document.querySelector('form.contact');
+const form = document.querySelector('form.contact[data-to]:not([data-supabase])');
 if (form) {
   form.addEventListener('submit', (e) => {
     e.preventDefault();

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://shiwakotisurendra.github.io/geosuren/sitemap.xml

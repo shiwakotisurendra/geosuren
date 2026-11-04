@@ -88,3 +88,30 @@ drop policy if exists "post author can delete comments" on public.comments;
 create policy "post author can delete comments" on public.comments
   for delete to authenticated
   using (exists (select 1 from public.posts p where p.id = post_id and p.author_id = auth.uid()));
+
+-- ---------------------------------------------------------------
+-- Contact form messages: anyone can send; only the owner can read/delete
+-- (replace the e-mail below if you ever change your login e-mail)
+-- ---------------------------------------------------------------
+create table if not exists public.messages (
+  id         uuid primary key default gen_random_uuid(),
+  name       text not null check (char_length(btrim(name)) between 1 and 100),
+  email      text not null check (char_length(email) between 3 and 200),
+  subject    text check (char_length(subject) <= 200),
+  message    text not null check (char_length(btrim(message)) between 1 and 5000),
+  created_at timestamptz not null default now()
+);
+
+alter table public.messages enable row level security;
+
+drop policy if exists "anyone can send a message" on public.messages;
+create policy "anyone can send a message" on public.messages
+  for insert to anon, authenticated with check (true);
+
+drop policy if exists "owner reads messages" on public.messages;
+create policy "owner reads messages" on public.messages
+  for select to authenticated using ((auth.jwt() ->> 'email') = 'shiwakotisurendra@gmail.com');
+
+drop policy if exists "owner deletes messages" on public.messages;
+create policy "owner deletes messages" on public.messages
+  for delete to authenticated using ((auth.jwt() ->> 'email') = 'shiwakotisurendra@gmail.com');
