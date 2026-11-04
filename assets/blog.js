@@ -200,8 +200,10 @@
         el('div', { id: 'view-map', class: 'mini-map' })) : null,
       isMine(p) ? el('div', { class: 'post-actions' },
         el('button', { class: 'btn small', type: 'button', onclick: () => openEditor(p) }, 'Edit'),
-        el('button', { class: 'btn ghost small danger', type: 'button', onclick: () => removePost(p) }, 'Delete')) : null);
+        el('button', { class: 'btn ghost small danger', type: 'button', onclick: () => removePost(p) }, 'Delete')) : null,
+      el('section', { id: 'comments', class: 'comments' }));
     showPanel('post');
+    loadComments(p);
     history.replaceState(null, '', `#post=${p.id}`);
     if (hasLoc(p)) {
       viewMap = L.map('view-map', { scrollWheelZoom: false }).setView([p.lat, p.lng], 9);
@@ -219,6 +221,69 @@
   window.addEventListener('hashchange', () => {
     if (location.hash.startsWith('#post=')) routeFromHash(); else showPanel('list');
   });
+
+  // ---------- comments ----------
+  async function loadComments(p) {
+    const box = $('comments');
+    if (!box) return;
+    const { data, error } = await sb.from('comments').select('*').eq('post_id', p.id).order('created_at', { ascending: true });
+    if (!$('comments') || box !== $('comments')) return;
+    box.replaceChildren();
+    if (error) { box.append(el('p', { class: 'hint' }, 'Comments could not be loaded.')); return; }
+    const mine = isMine(p);
+    const approved = data.filter((c) => c.approved);
+    const pending = data.filter((c) => !c.approved);
+
+    box.append(el('h3', {}, `Comments (${approved.length})`));
+    if (!approved.length) box.append(el('p', { class: 'hint' }, 'No comments yet. Be the first to comment.'));
+    approved.forEach((c) => box.append(commentItem(p, c, mine)));
+
+    if (mine && pending.length) {
+      box.append(el('h3', {}, `Waiting for approval (${pending.length})`));
+      pending.forEach((c) => box.append(commentItem(p, c, true)));
+    }
+
+    // submit form (honeypot field "website" must stay empty)
+    const status = el('p', { class: 'hint', role: 'status' });
+    const name = el('input', { name: 'author_name', maxlength: '80', required: '', autocomplete: 'name' });
+    const body = el('textarea', { name: 'body', rows: '4', maxlength: '2000', required: '' });
+    const trap = el('input', { name: 'website', tabindex: '-1', autocomplete: 'off', 'aria-hidden': 'true' });
+    const submit = el('button', { class: 'btn', type: 'submit' }, 'Post comment');
+    const form = el('form', { class: 'contact comment-form', onsubmit: async (e) => {
+      e.preventDefault();
+      if (trap.value) { form.reset(); status.textContent = 'Thanks! Your comment will appear after approval.'; return; }
+      submit.disabled = true;
+      const { error: err } = await sb.from('comments').insert({ post_id: p.id, author_name: name.value.trim(), body: body.value.trim() });
+      submit.disabled = false;
+      if (err) { status.textContent = 'Could not send your comment. Please try again.'; return; }
+      form.reset();
+      status.textContent = 'Thanks! Your comment will appear after approval.';
+    } },
+      el('h3', {}, 'Leave a comment'),
+      el('label', {}, 'Name', name),
+      el('label', {}, 'Comment', body),
+      el('div', { class: 'hp', 'aria-hidden': 'true' }, el('label', {}, 'Website', trap)),
+      el('p', {}, submit), status);
+    box.append(form);
+  }
+
+  function commentItem(p, c, mine) {
+    const acts = mine ? el('div', { class: 'post-actions' },
+      c.approved ? null : el('button', { class: 'btn small', type: 'button', onclick: async () => {
+        const { error } = await sb.from('comments').update({ approved: true }).eq('id', c.id);
+        if (error) return msg(error.message, 'error');
+        loadComments(p);
+      } }, 'Approve'),
+      el('button', { class: 'btn ghost small danger', type: 'button', onclick: async () => {
+        if (!confirm('Delete this comment?')) return;
+        const { error } = await sb.from('comments').delete().eq('id', c.id);
+        if (error) return msg(error.message, 'error');
+        loadComments(p);
+      } }, 'Delete')) : null;
+    return el('div', { class: 'comment' + (c.approved ? '' : ' pending') },
+      el('div', { class: 'comment-meta' }, el('strong', {}, c.author_name), ` · ${fmtDate(c.created_at)}`, c.approved ? '' : ' · pending'),
+      el('p', {}, c.body), acts);
+  }
 
   // ---------- editor ----------
   const f = () => $('post-form');

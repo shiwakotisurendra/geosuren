@@ -44,3 +44,47 @@ begin new.updated_at = now(); return new; end $$;
 drop trigger if exists posts_touch on public.posts;
 create trigger posts_touch before update on public.posts
   for each row execute function public.touch_updated_at();
+
+-- ---------------------------------------------------------------
+-- Comments: anyone can submit; hidden until the post's author approves
+-- ---------------------------------------------------------------
+create table if not exists public.comments (
+  id          uuid primary key default gen_random_uuid(),
+  post_id     uuid not null references public.posts(id) on delete cascade,
+  author_name text not null check (char_length(btrim(author_name)) between 1 and 80),
+  body        text not null check (char_length(btrim(body)) between 1 and 2000),
+  approved    boolean not null default false,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists comments_post_idx on public.comments (post_id, created_at);
+
+alter table public.comments enable row level security;
+
+-- Visitors see approved comments only
+drop policy if exists "approved comments are public" on public.comments;
+create policy "approved comments are public" on public.comments
+  for select using (approved = true);
+
+-- The author of a post sees every comment on it (including pending)
+drop policy if exists "post author sees all comments" on public.comments;
+create policy "post author sees all comments" on public.comments
+  for select to authenticated
+  using (exists (select 1 from public.posts p where p.id = post_id and p.author_id = auth.uid()));
+
+-- Anyone may submit a comment, but only as "pending"
+drop policy if exists "anyone can submit pending comment" on public.comments;
+create policy "anyone can submit pending comment" on public.comments
+  for insert to anon, authenticated with check (approved = false);
+
+-- Only the post's author can approve or delete
+drop policy if exists "post author can approve" on public.comments;
+create policy "post author can approve" on public.comments
+  for update to authenticated
+  using (exists (select 1 from public.posts p where p.id = post_id and p.author_id = auth.uid()))
+  with check (exists (select 1 from public.posts p where p.id = post_id and p.author_id = auth.uid()));
+
+drop policy if exists "post author can delete comments" on public.comments;
+create policy "post author can delete comments" on public.comments
+  for delete to authenticated
+  using (exists (select 1 from public.posts p where p.id = post_id and p.author_id = auth.uid()));
