@@ -240,3 +240,12 @@ fieldset.loc legend { font-weight: 600; padding: 0 .4rem; }
 .comment-meta { font-size: .85rem; color: var(--muted); }
 .comment-form { margin-top: 1.5rem; max-width: 640px; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* Blog: use (almost) the full window width */
+.container.wide { width: min(100% - 3rem, 2000px); }
+#posts { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+#post-view.prose { max-width: none; }
+#post-view p, #post-view h2, #post-view .chips, .comment { max-width: none; }
+#post-view .mini-map { height: 480px; }
+.comment-form { max-width: 900px; }
+#post-view .chips { padding-left: 0; }
