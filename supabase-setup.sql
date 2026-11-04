@@ -115,3 +115,24 @@ create policy "owner reads messages" on public.messages
 drop policy if exists "owner deletes messages" on public.messages;
 create policy "owner deletes messages" on public.messages
   for delete to authenticated using ((auth.jwt() ->> 'email') = 'shiwakotisurendra@gmail.com');
+
+-- ---------------------------------------------------------------
+-- Media uploads for blog posts (images up to 50 MB, mp4/webm video)
+-- Public bucket: anyone can view files; only the owner can upload/delete.
+-- ---------------------------------------------------------------
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('blog-media', 'blog-media', true, 52428800,
+        array['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm'])
+on conflict (id) do update
+  set public = true, file_size_limit = 52428800,
+      allowed_mime_types = array['image/jpeg','image/png','image/webp','image/gif','video/mp4','video/webm'];
+
+drop policy if exists "owner uploads blog media" on storage.objects;
+create policy "owner uploads blog media" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'blog-media' and (auth.jwt() ->> 'email') = 'shiwakotisurendra@gmail.com');
+
+drop policy if exists "owner deletes blog media" on storage.objects;
+create policy "owner deletes blog media" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'blog-media' and (auth.jwt() ->> 'email') = 'shiwakotisurendra@gmail.com');
