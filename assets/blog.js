@@ -131,7 +131,7 @@
       el('div', { class: 'body' },
         el('div', { class: 'tag' }, fmtDate(p.created_at), p.place_name ? ` · 📍 ${p.place_name}` : ''),
         el('h3', {}, el('a', { href: `#post=${p.id}` }, p.title)),
-        el('p', {}, p.summary || (p.body.length > 180 ? p.body.slice(0, 180) + '…' : p.body)),
+        el('p', {}, window.BlogRender.excerpt(p)),
         p.tags && p.tags.length ? el('ul', { class: 'chips' }, p.tags.map((t) => el('li', {}, t))) : null,
         actions));
   }
@@ -169,20 +169,7 @@
   $('blog-filter').addEventListener('input', renderPosts);
 
   // ---------- single post ----------
-  function renderBody(text) {
-    const wrap = el('div', {});
-    text.split(/\n{2,}/).forEach((block) => {
-      const t = block.trim();
-      if (!t) return;
-      if (t.startsWith('## ')) wrap.append(el('h2', {}, t.slice(3)));
-      else {
-        const p = el('p', {});
-        t.split('\n').forEach((line, i) => { if (i) p.append(el('br')); p.append(line); });
-        wrap.append(p);
-      }
-    });
-    return wrap;
-  }
+  const renderBody = (text) => window.BlogRender.renderBody(text);
 
   let viewMap = null;
   function openPost(p) {
@@ -312,6 +299,7 @@
     const form = f();
     form.reset();
     clearPin();
+    $('md-preview').hidden = true;
     $('editor-title').textContent = p ? 'Edit post' : 'New post';
     $('post-save').textContent = p ? 'Save changes' : 'Publish';
     form.id.value = p ? p.id : '';
@@ -343,6 +331,64 @@
   }
   $('place-go').addEventListener('click', searchPlace);
   $('place-q').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); searchPlace(); } });
+
+  // ---------- media upload + preview ----------
+  const MEDIA_BUCKET = 'blog-media';
+  const MAX_VIDEO_MB = 50, MAX_IMAGE_PX = 2000;
+  const EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif', 'video/mp4': 'mp4', 'video/webm': 'webm' };
+
+  function insertAtCursor(text) {
+    const ta = f().body;
+    const a = ta.selectionStart ?? ta.value.length, b = ta.selectionEnd ?? ta.value.length;
+    ta.value = ta.value.slice(0, a) + text + ta.value.slice(b);
+    ta.focus(); ta.selectionStart = ta.selectionEnd = a + text.length;
+  }
+
+  async function shrinkImage(file) {
+    if (file.type === 'image/gif') return file;
+    try {
+      const bmp = await createImageBitmap(file);
+      if (bmp.width <= MAX_IMAGE_PX) return file;
+      const scale = MAX_IMAGE_PX / bmp.width;
+      const c = document.createElement('canvas');
+      c.width = MAX_IMAGE_PX; c.height = Math.round(bmp.height * scale);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      const type = file.type === 'image/png' ? 'image/png' : 'image/webp';
+      const blob = await new Promise((res) => c.toBlob(res, type, 0.85));
+      return blob || file;
+    } catch { return file; }
+  }
+
+  async function uploadMedia(file) {
+    if (!session) return showPanel('login');
+    if (!EXT[file.type]) return msg('Allowed files: JPG, PNG, WebP, GIF images and MP4/WebM videos.', 'error');
+    const isVideo = file.type.startsWith('video/');
+    if (isVideo && file.size > MAX_VIDEO_MB * 1024 * 1024) return msg(`Videos can be at most ${MAX_VIDEO_MB} MB. For longer videos, upload to YouTube or Vimeo and paste the link.`, 'error');
+    let alt = '';
+    if (!isVideo) {
+      alt = (prompt('Short description of the image (for accessibility):', file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ')) || '').replace(/[\[\]\n]/g, ' ').trim();
+    }
+    msg('Uploading…');
+    const blob = isVideo ? file : await shrinkImage(file);
+    const type = blob.type || file.type;
+    const path = `${new Date().toISOString().slice(0, 10)}/${crypto.randomUUID()}.${EXT[type] || EXT[file.type]}`;
+    const { error } = await sb.storage.from(MEDIA_BUCKET).upload(path, blob, { contentType: type, cacheControl: '31536000', upsert: false });
+    if (error) return msg('Upload failed: ' + error.message, 'error');
+    const url = sb.storage.from(MEDIA_BUCKET).getPublicUrl(path).data.publicUrl;
+    insertAtCursor(isVideo ? `\n\n${url}\n\n` : `\n\n![${alt}](${url})\n\n`);
+    msg('');
+  }
+
+  const pick = (accept) => { const i = $('media-file'); i.accept = accept; i.value = ''; i.click(); };
+  $('add-image').addEventListener('click', () => pick('image/jpeg,image/png,image/webp,image/gif'));
+  $('add-video').addEventListener('click', () => pick('video/mp4,video/webm'));
+  $('media-file').addEventListener('change', (e) => { const fl = e.target.files[0]; if (fl) uploadMedia(fl); });
+  $('md-preview-btn').addEventListener('click', () => {
+    const pv = $('md-preview');
+    if (!pv.hidden) { pv.hidden = true; return; }
+    pv.replaceChildren(el('h3', {}, 'Preview'), renderBody(f().body.value));
+    pv.hidden = false;
+  });
 
   f().addEventListener('submit', async (e) => {
     e.preventDefault();
